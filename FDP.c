@@ -114,14 +114,16 @@ baralho* inicia_baralho(){
 }
 
 carta* prepara_cartas(){
-    carta *array = (carta*)malloc(TAM_BARALHO*sizeof(carta));
-    int i,j=4;
-    for(i=0;i<TAM_BARALHO;i++){
-        array[i].face = j;
+    carta *array = (carta*)malloc(TAM_BARALHO * sizeof(carta));
+    int i, j = 4;
+    char faces[] = {'4', '5', '6', '7', 'Q', 'J', 'K', 'A', '2', '3', '7', 'A', '7', '4'};
+    for(i = 0; i < TAM_BARALHO; i++){
+        array[i].face = faces[j - 4];
         array[i].poder = j;
-        if((i+1)%4==0)
+        if((i + 1) % 4 == 0)
             j++;
-    }
+        }
+
     for(i=0;i<TAM_BARALHO;i+=4){
         strcpy(array[i].naipe,"Ouros");
         strcpy(array[i+1].naipe,"Espadas");
@@ -415,7 +417,7 @@ int menu(lista_jogadores *LJ, int *qtd_jog){
             case 1:
                 printf("As regras do jogo FDP sao as seguintes: \n");
                 printf("O jogo de cartas Fedaput* eh um jogo baseado no jogo de cartas muito conhecido denominado Truco. Este jogo utiliza-se de um baralho, mas nao por completo. Sao usadas as seguintes cartas:\n");
-                printf("AS (A) (4 naipes)\n DOIS (4 naipes)\n TRES (4 naipes)\n QUATRO (4 naipes)\n CINCO (4 naipes)\n SEIS (4 naipes)\n SETE (4 naipes)\n DAMA (Q) (4 naipes)\n VALETE (J) (4 naipes)\n REI (K) (4 naipes)\n");
+                printf("AS (11) (4 naipes)\n DOIS (12) (4 naipes)\n TRES (13) (4 naipes)\n QUATRO (4 naipes)\n CINCO (4 naipes)\n SEIS (4 naipes)\n SETE (4 naipes)\n DAMA (8) (4 naipes)\n VALETE (9) (4 naipes)\n REI (10) (4 naipes)\n");
                 printf("Para se jogar o jogo Fedaput*, eh necessario apenas saber quais as cartas sao jogadas no Truco, e principalmente quais as regras de valoracao das cartas.\nDesta forma, a seguir sera apresentada a sequencia de valor das cartas no Truco.\n");
                 printf("Manilhas - Sao fixas. Da mais forte para a mais fraca: 4 de Paus / 7 de Copas / as de Espadas / 7 de Ouros;\n");
                 printf("Ordem das cartas (da menor para maior): 4, 5, 6, 7, Q, J, K, A, 2, 3\n");
@@ -436,7 +438,7 @@ int menu(lista_jogadores *LJ, int *qtd_jog){
                     insere_jogador_fim(LJ,x);
                     qtd++;
                 }
-                else if(qtd>8){
+                else if(qtd>=8){
                     printf("\nNumero maximo de jogadores atingido. Iniciando partida\n");
                     opcao =0;
                     break;
@@ -479,7 +481,7 @@ int rodada(lista_jogadores *LJ, baralho *b,int *qtd_cartas, int *nmr_rodada, int
             printf("--------------- %s, veja suas cartas: --------------- \n\n",percorre->nome);
             i=1;
             while(aux!=NULL){
-                printf("Posicao %d: %d de %s.\n",i,aux->x.face,aux->x.naipe);
+                printf("Posicao %d: %c de %s.\n",i,aux->x.face,aux->x.naipe);
                 i++;
                 aux = aux->prox;
             }
@@ -512,20 +514,21 @@ int rodada(lista_jogadores *LJ, baralho *b,int *qtd_cartas, int *nmr_rodada, int
                 i = 1;
                 printf("--------------- %s (%d vidas), veja suas cartas: --------------- \n\n",percorre->nome,percorre->vidas);
                 while(aux!=NULL){
-                    printf("Posicao %d: %d de %s.\n",i,aux->x.face,aux->x.naipe);
+                    printf("Posicao %d: %c de %s.\n",i,aux->x.face,aux->x.naipe);
                     aux = aux->prox;                    
                     i+=1;
                     }
                 printf("\n--------------- %s , informe a posicao da carta que deseja jogar: --------------- \n\n",percorre->nome);
                 do{
+                    posicao =0;
                     scanf("%d",&posicao);
-                    if(posicao<1 || posicao>i)
-                        printf("Posicao invalida, escolha um dos numeros acima.");
-                }while(posicao<1 || posicao >i);
+                    if(posicao<1 || posicao>=i)
+                        printf("Posicao invalida, escolha um dos numeros acima.\n");
+                }while(posicao<1 || posicao >=i);
                 
                 jogadas[z].jog = percorre; // primeiro jogador a jogar vai pro indice 0 do array de jogadas.
                 remove_carta_jogo(percorre,posicao,&jogadas[z].c.x);
-                fprintf(arq," ========== %s jogou %d de %s ==========\n",jogadas[z].jog->nome,jogadas[z].c.x.face,jogadas[z].c.x.naipe);
+                fprintf(arq," ========== %s jogou %c de %s ==========\n",jogadas[z].jog->nome,jogadas[z].c.x.face,jogadas[z].c.x.naipe);
                 z++;
                 percorre = percorre->prox;
                 if(percorre == NULL)
@@ -548,32 +551,32 @@ int rodada(lista_jogadores *LJ, baralho *b,int *qtd_cartas, int *nmr_rodada, int
         *qtd_jog-=verif_vidas(LJ,arq,*qtd_jog); //remove quantos jogadores forem eliminados.
             
         if(*qtd_jog ==1){
-            fprintf(arq,"==========O jogador %s foi o ultimo restante e venceu o jogo!!==========\n ",LJ->inicio->nome);
+            fprintf(arq,"==========O jogador %s foi o ultimo restante e venceu o jogo com %d vidas restantes!!\n==========\n ",LJ->inicio->nome,LJ->inicio->vidas);
             printf("==========\nO jogador %s foi o ultimo restante e venceu o jogo com %d vidas restantes!!\n==========\n ",LJ->inicio->nome,LJ->inicio->vidas);
             return 1;
         }else if(*qtd_jog==0){
+            fprintf(arq,"TODOS OS JOGAODRES ZERARAM A VIDA E POR ISSO NINGUEM GANHOU\n");
             printf("TODOS OS JOGADORES ZERARAM A VIDA E POR ISSO NENHUM GANHOU\n");
             return 1;
         }
         *nmr_rodada +=1;
         
-        *qtd_cartas += incremento;
-        if(*qtd_cartas <1){
+        *qtd_cartas += incremento;  // faz a quantiade de cartas ir de 5 ate 1 e depois de 1 ate 5 novamente
+        if(*qtd_cartas <1){     
             *qtd_cartas =1;
             incremento = 1;
         }
         if(*qtd_cartas>5){
             *qtd_cartas =5;
             incremento =-1;
-            break;
         }
+
         //esse pedaço de codigo está assim pois nao consegui passar por referencia a variavel *qtd_cartas. acho que devido à ela ja ter sido passada por referencia para a função rodada.
         quantia_cartas = *qtd_cartas;
         while (percorre!=NULL){
                 percorre->mao->inicio=NULL;
                 percorre = percorre->prox;
             }
-
         dar_cartas_jogadores(b,LJ,&quantia_cartas,*qtd_jog);  
         percorre = LJ->inicio;
         i=1;
