@@ -12,7 +12,7 @@
 //Definição de tads:
 
 typedef struct carta{
-    int face;   //4,5,6,7, 8 = Q, 9 = J, 10 = K, 11 = A, 12 = 2, 13 = 3, 14 = 7 OUROS, 15 = A ESPADAS, 16 = 7 COPAS, 17=4 PAUS
+    char face;   //4,5,6,7, 8 = Q, 9 = J, 10 = K, 11 = A, 12 = 2, 13 = 3, 14 = 7 OUROS, 15 = A ESPADAS, 16 = 7 COPAS, 17=4 PAUS
     char naipe[8];
     int poder;  //define qual carta mata qual
 }carta;
@@ -115,10 +115,10 @@ baralho* inicia_baralho(){
 
 carta* prepara_cartas(){
     carta *array = (carta*)malloc(TAM_BARALHO * sizeof(carta));
-    int i, j = 4;
+    int i, j = 0;
     char faces[] = {'4', '5', '6', '7', 'Q', 'J', 'K', 'A', '2', '3', '7', 'A', '7', '4'};
     for(i = 0; i < TAM_BARALHO; i++){
-        array[i].face = faces[j - 4];
+        array[i].face = faces[j];
         array[i].poder = j;
         if((i + 1) % 4 == 0)
             j++;
@@ -324,6 +324,8 @@ int verifica_vencedor_rodada(jogada *jogadas, int num_jogadores){
             indice_vencedor = i;
         }
     }
+    if(indice_vencedor!= -1)
+        jogadas[indice_vencedor].jog->matou++;
     return indice_vencedor; // retorna -1 se todas kangarem.
 }
 
@@ -417,7 +419,7 @@ int menu(lista_jogadores *LJ, int *qtd_jog){
             case 1:
                 printf("As regras do jogo FDP sao as seguintes: \n");
                 printf("O jogo de cartas Fedaput* eh um jogo baseado no jogo de cartas muito conhecido denominado Truco. Este jogo utiliza-se de um baralho, mas nao por completo. Sao usadas as seguintes cartas:\n");
-                printf("AS (11) (4 naipes)\n DOIS (12) (4 naipes)\n TRES (13) (4 naipes)\n QUATRO (4 naipes)\n CINCO (4 naipes)\n SEIS (4 naipes)\n SETE (4 naipes)\n DAMA (8) (4 naipes)\n VALETE (9) (4 naipes)\n REI (10) (4 naipes)\n");
+                printf("AS  (4 naipes)\n DOIS  (4 naipes)\n TRES (4 naipes)\n QUATRO (4 naipes)\n CINCO (4 naipes)\n SEIS (4 naipes)\n SETE (4 naipes)\n DAMA (Q) (4 naipes)\n VALETE (J) (4 naipes)\n REI (K) (4 naipes)\n");
                 printf("Para se jogar o jogo Fedaput*, eh necessario apenas saber quais as cartas sao jogadas no Truco, e principalmente quais as regras de valoracao das cartas.\nDesta forma, a seguir sera apresentada a sequencia de valor das cartas no Truco.\n");
                 printf("Manilhas - Sao fixas. Da mais forte para a mais fraca: 4 de Paus / 7 de Copas / as de Espadas / 7 de Ouros;\n");
                 printf("Ordem das cartas (da menor para maior): 4, 5, 6, 7, Q, J, K, A, 2, 3\n");
@@ -471,7 +473,7 @@ int rodada(lista_jogadores *LJ, baralho *b,int *qtd_cartas, int *nmr_rodada, int
     int k=0;
     int incremento=-1;
     // a cada rodada, cada jogador vai ver suas cartas e jogar uma por vez. depois q todos os jogadores jogarem 1 carta, aquele que matou a rodada é quem começara jogando na proxima,
-    printf("LEMBRETE!\n Para facilitar a realizacao do trabalho e da jogatina as cartas foram transformadas em numeros, e o poder das cartas cresce junto com o numero delas, logo, a carta 9 mata a 8 e assim por diante\nentretanto, as manilhas do truco mineiro foram mantidas e por isso, para essas 4 cartas a ordem numerica nao e valida e mantem-se a ordem do truco.\n");
+    
     for(int rnd = 0; rnd <RODADAS;rnd++){
         aux = percorre->mao->inicio;
         fprintf(arq,"\n ========== COMECANDO A %d RODADA ==========\n",rnd+1);
